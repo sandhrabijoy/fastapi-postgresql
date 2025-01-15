@@ -24,7 +24,7 @@ def get_db():
         yield db
     finally:
         db.close()
-
+        
 db_dependency=Annotated(Session,Depends(get_db))
 
 @app.post("/questions/")
@@ -34,5 +34,6 @@ async def create_questions(question:QuestionBase,db:db_dependency):
     db.commit()
     db.refresh(db_question)
     for choice in question.choices:
-        db_choice=models.Choices(choice_text=choice.choice_text,is_correct=choice.is_correct)
+        db_choice=models.Choices(choice_text=choice.choice_text,is_correct=choice.is_correct,question_id=db_question.id)
         db.add(db_choice)
+    db.commit()
